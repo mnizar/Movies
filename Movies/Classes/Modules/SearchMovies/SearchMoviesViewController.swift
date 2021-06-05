@@ -17,18 +17,19 @@ class SearchMoviesViewController: UIViewController {
     
     var viewModel = SearchMoviesViewModel()
     var disposeBag = DisposeBag()
+    var optionSearchBarButtonItem: UIBarButtonItem!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         setupUI()
         setupTableView()
-        
         bindViewModel()
     }
     
     private func setupUI() {
-        self.title = "Movies"
+        self.navigationController?.navigationBar.tintColor = Constants.Colors.D90016.color()
+        self.title = "Search"
         searchView.layer.borderWidth = 0.5
         searchView.layer.borderColor = Constants.Colors.F3F3F3.color().cgColor
         searchView.layer.cornerRadius = 10
@@ -39,7 +40,25 @@ class SearchMoviesViewController: UIViewController {
                                            blur: 4,
                                            spread: 0)
         searchTextfield.returnKeyType = .search
-        searchTextfield.placeholder = "Search movies, tv show etc"
+        searchTextfield.placeholder = viewModel.currentType == .movie ? "Search movies" : "Search TV Show"
+        
+        var menuItems: [UIAction] {
+            return [
+                UIAction(title: "Movie", image: UIImage(systemName: "ticket"), handler: { (_) in
+                    self.updateSelectedSearch(.movie)
+                }),
+                UIAction(title: "TV Show", image: UIImage(systemName: "tv"), handler: { (_) in
+                    self.updateSelectedSearch(.tvShow)
+                })
+            ]
+        }
+        var searchMenu: UIMenu {
+            return UIMenu(title: "Change Search", image: nil, identifier: nil, options: [], children: menuItems)
+        }
+        let image = viewModel.currentType == .movie ? UIImage(systemName: "ticket") : UIImage(systemName: "tv")
+        optionSearchBarButtonItem = UIBarButtonItem(title: "", image: image, primaryAction: nil, menu: searchMenu)
+        navigationItem.rightBarButtonItem = optionSearchBarButtonItem
+
     }
     
     private func setupTableView() {
@@ -91,10 +110,25 @@ class SearchMoviesViewController: UIViewController {
             })
             .disposed(by: disposeBag)
         
-        viewModel.query.accept("marvel")
+        searchTextfield.text = "marvel"
+        viewModel.query.accept(searchTextfield.text)
     }
     
-    func loadMore() {
+    private func updateSelectedSearch(_ type:SearchType) {
+        if (viewModel.currentType == type) {
+            return
+        }
+        
+        viewModel.currentType = type
+        searchTextfield.text = ""
+        viewModel.query.accept("")
+        viewModel.clearAllFetchedData()
+        searchTextfield.placeholder = viewModel.currentType == .movie ? "Search movies" : "Search TV Show"
+        let image = viewModel.currentType == .movie ? UIImage(systemName: "ticket") : UIImage(systemName: "tv")
+        optionSearchBarButtonItem.image = image
+    }
+    
+    private func loadMore() {
         if viewModel.loadingState.value != .loading {
             viewModel.getSearchMovies(isBottomLoad: true)
         }
@@ -121,7 +155,9 @@ extension SearchMoviesViewController: UITableViewDataSource, UITableViewDelegate
             let cell = tableView.dequeueReusableCell(withIdentifier: String(describing: EmptyTableViewCell.self), for: indexPath) as! EmptyTableViewCell
             cell.delegate = self
             if (searchTextfield.text?.isEmpty == true) {
-                cell.configureCell("Search all movies", imageName: "launchScreenIcon")
+                let wording = viewModel.currentType == .movie ? "Search all movies" : "Search all TV Shows"
+                cell.configureCell(wording, imageName: "launchScreenIcon")
+                cell.retryButton.isHidden = true
             } else {
                 cell.configureCell("No Results. Try a new search", imageName: "noResult")
             }
@@ -189,6 +225,13 @@ extension SearchMoviesViewController: UITextFieldDelegate {
             updatedText = updatedText.trimmingCharacters(in: .whitespaces)
             viewModel.query.accept(updatedText)
         }
+        return true
+    }
+    
+    func textFieldShouldClear(_ textField: UITextField) -> Bool {
+        viewModel.query.accept("")
+        viewModel.clearAllFetchedData()
+        
         return true
     }
     

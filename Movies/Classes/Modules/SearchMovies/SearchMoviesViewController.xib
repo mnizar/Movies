@@ -24,7 +24,7 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="OMf-7f-DGl">
-                    <rect key="frame" x="0.0" y="44" width="414" height="818"/>
+                    <rect key="frame" x="0.0" y="88" width="414" height="774"/>
                     <subviews>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="HC9-C4-dlQ">
                             <rect key="frame" x="16" y="8" width="382" height="40"/>
@@ -62,7 +62,7 @@
                             </constraints>
                         </view>
                         <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" allowsSelection="NO" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="t91-qR-rtd">
-                            <rect key="frame" x="0.0" y="56" width="414" height="762"/>
+                            <rect key="frame" x="0.0" y="56" width="414" height="718"/>
                             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                             <inset key="separatorInset" minX="16" minY="0.0" maxX="16" maxY="0.0"/>
                             <userDefinedRuntimeAttributes>
@@ -94,6 +94,7 @@
                 <constraint firstItem="fnl-2z-Ty3" firstAttribute="bottom" secondItem="OMf-7f-DGl" secondAttribute="bottom" id="UdQ-vg-r1s"/>
                 <constraint firstItem="OMf-7f-DGl" firstAttribute="top" secondItem="fnl-2z-Ty3" secondAttribute="top" id="dvx-9j-GVO"/>
             </constraints>
+            <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
             <point key="canvasLocation" x="-296" y="153"/>
         </view>
     </objects>
