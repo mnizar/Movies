@@ -1,8 +1,8 @@
 # Introduction
-This is as part of the recruitment process at Cakap
+-
 
 ## Supported Device
-- iOS 13 or later
+- iOS 14.1 or later
 
 ## About The App
 - Search movies based entered keyword using API OMDb : http://www.omdbapi.com
@@ -19,6 +19,7 @@ Starting
 - Clone or Download Project
 - Open terminal and change directory to the project and running pod install 
 - open file `Movies.xcworkspace`
+
 
 Attributes
 ---------
