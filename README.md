@@ -1,5 +1,5 @@
 # Introduction
--
+![ezgif-3-3e725733ce34](https://user-images.githubusercontent.com/4274589/120936288-5054ed00-c731-11eb-84ff-0b74b9d002ab.gif)
 
 ## Supported Device
 - iOS 14.1 or later
