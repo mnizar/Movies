@@ -68,8 +68,8 @@ class SearchMoviesViewModel {
         let searchType = currentType
         
         if let searchModels = fetchSearchModelFromDb(keyword: keyword, type: searchType), searchModels.count > 0 {
-            self.buildContentCellModels(searchModels)
-            self.loadingState.accept(.finished)
+            buildContentCellModels(searchModels)
+            loadingState.accept(.finished)
         }
         getSearchMovies(clearCurrentData, isBottomLoad: isBottomLoad)
     }
@@ -80,7 +80,7 @@ extension SearchMoviesViewModel {
     func getSearchMovies(_ clearCurrentData: Bool = false, isBottomLoad: Bool = false) {
         if isBottomLoad == false {
             page = 1
-            self.loadingState.accept(.loading)
+            loadingState.accept(.loading)
         }
         
         return SearchProvider()
@@ -91,6 +91,7 @@ extension SearchMoviesViewModel {
                 } else {
                     self?.errorMessage = "No Internet Connection"
                 }
+                self?.canLoadMore = false
                 self?.loadingState.accept(.failed)
                 return Observable.empty()
             })

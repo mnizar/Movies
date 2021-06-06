@@ -103,8 +103,8 @@ class SearchMoviesViewController: UIViewController {
                 guard let weakSelf = self else { return }
                 DispatchQueue.main.async {
                     if (loadingState == .loading) {
-                        if (weakSelf.viewModel.dataSource?.count ?? 0) == 0 {
-                            weakSelf.tableView.showAnimatedSkeleton()
+                        if (weakSelf.viewModel.numberOfCellModels()) == 0 {
+                            weakSelf.tableView.showAnimatedSkeleton(transition:.crossDissolve(0.0))
                         }
                     } else {
                         weakSelf.tableView.hideSkeleton()
@@ -126,7 +126,6 @@ class SearchMoviesViewController: UIViewController {
         viewModel.currentType = type
         searchTextfield.text = ""
         viewModel.query.accept("")
-        viewModel.clearAllFetchedData()
         searchTextfield.placeholder = viewModel.currentType == .movie ? "Search movies" : "Search TV Show"
         let image = viewModel.currentType == .movie ? UIImage(systemName: "ticket") : UIImage(systemName: "tv")
         optionSearchBarButtonItem.image = image
@@ -142,7 +141,8 @@ class SearchMoviesViewController: UIViewController {
 // MARK: UITableViewDataSource, UITableViewDelegate
 extension SearchMoviesViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if viewModel.loadingState.value == .notLoad {
+        if viewModel.loadingState.value == .notLoad ||
+            viewModel.loadingState.value == .loading {
             return 0
         }
         var numberOfRows = viewModel.numberOfCellModels()
