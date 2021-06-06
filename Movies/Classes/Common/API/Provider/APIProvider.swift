@@ -40,6 +40,7 @@ class APIProvider {
             do {
                 guard let url = URL(string: urlString) else {
                     observer.onError(NSError(domain: urlString, code: NSURLErrorBadURL, userInfo: nil))
+                    print("errorrr bad urll")
                     return Disposables.create()
                 }
                 var aRequest = URLRequest(url: url)

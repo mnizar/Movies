@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import RealmSwift
 
 struct SearchResponseModel: Codable {
     let search: [SearchModel]?
@@ -22,12 +23,15 @@ struct SearchResponseModel: Codable {
 }
 
 // MARK: - SearchResultModel
-struct SearchModel: Codable {
-    let title: String?
-    let year: String?
-    let imdbID: String?
-    let type: String?
-    let posterUrl: String?
+class SearchModel: Object, Codable {
+    @objc dynamic var title: String?
+    @objc dynamic var year: String?
+    @objc dynamic var imdbID: String?
+    @objc dynamic var type: String?
+    @objc dynamic var posterUrl: String?
+    
+    //Inverse to SearchResults.
+    let searchResults = LinkingObjects(fromType: SearchResult.self, property: "items")
     
     enum CodingKeys: String, CodingKey {
         case title = "Title"
@@ -36,4 +40,18 @@ struct SearchModel: Codable {
         case type = "Type"
         case posterUrl = "Poster"
     }
+}
+
+
+class SearchResult: Object {
+     
+    @objc dynamic var keyword = ""
+    @objc dynamic var type = ""
+    let items = List<SearchModel>()  //one-to-many
+     
+    override static func primaryKey() -> String? {
+        return "keyword"
+    }
+     
+    
 }

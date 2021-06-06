@@ -80,9 +80,11 @@ class SearchMoviesViewController: UIViewController {
             .distinctUntilChanged()
             .asObservable()
             .subscribe(onNext: { [weak self] (searchText) in
-                if let querySearch = searchText, querySearch.count > 2 {
+                if let querySearch = searchText, querySearch.count > 0 {
                     self?.viewModel.clearAllFetchedData()
-                    self?.viewModel.getSearchMovies(true)
+                    self?.viewModel.performSearch(true)
+                } else {
+                    self?.viewModel.clearAllFetchedData()
                 }
             }).disposed(by: disposeBag)
         
@@ -100,8 +102,10 @@ class SearchMoviesViewController: UIViewController {
             .subscribe(onNext: { [weak self] (loadingState) in
                 guard let weakSelf = self else { return }
                 DispatchQueue.main.async {
-                    if (loadingState == .loading || loadingState == .notLoad) {
-                        weakSelf.tableView.showAnimatedSkeleton()
+                    if (loadingState == .loading) {
+                        if (weakSelf.viewModel.dataSource?.count ?? 0) == 0 {
+                            weakSelf.tableView.showAnimatedSkeleton()
+                        }
                     } else {
                         weakSelf.tableView.hideSkeleton()
                         weakSelf.tableView.reloadData()
@@ -138,6 +142,9 @@ class SearchMoviesViewController: UIViewController {
 // MARK: UITableViewDataSource, UITableViewDelegate
 extension SearchMoviesViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if viewModel.loadingState.value == .notLoad {
+            return 0
+        }
         var numberOfRows = viewModel.numberOfCellModels()
         if (numberOfRows == 0) {
             numberOfRows = 1
@@ -155,11 +162,13 @@ extension SearchMoviesViewController: UITableViewDataSource, UITableViewDelegate
             let cell = tableView.dequeueReusableCell(withIdentifier: String(describing: EmptyTableViewCell.self), for: indexPath) as! EmptyTableViewCell
             cell.delegate = self
             if (searchTextfield.text?.isEmpty == true) {
-                let wording = viewModel.currentType == .movie ? "Search all movies" : "Search all TV Shows"
-                cell.configureCell(wording, imageName: "launchScreenIcon")
+                let descriptionString = viewModel.currentType == .movie ? "Search all movies" : "Search all TV Shows"
+                cell.configureCell(descriptionString, imageName: "launchScreenIcon")
                 cell.retryButton.isHidden = true
             } else {
-                cell.configureCell("No Results. Try a new search", imageName: "noResult")
+                let descriptionString = viewModel.errorMessage == nil ? "No Results. Try a new search" : (viewModel.errorMessage ?? "")
+                cell.configureCell(descriptionString, imageName: "noResult")
+                cell.retryButton.isHidden = false
             }
             return cell
         } else {
@@ -230,8 +239,6 @@ extension SearchMoviesViewController: UITextFieldDelegate {
     
     func textFieldShouldClear(_ textField: UITextField) -> Bool {
         viewModel.query.accept("")
-        viewModel.clearAllFetchedData()
-        
         return true
     }
     
@@ -240,7 +247,7 @@ extension SearchMoviesViewController: UITextFieldDelegate {
 // MARK: EmptyTableViewCellDelegate
 extension SearchMoviesViewController: EmptyTableViewCellDelegate {
     func retryButtonDidClicked() {
-        self.viewModel.getSearchMovies(true)
+        self.viewModel.performSearch(true)
     }
 }
 
